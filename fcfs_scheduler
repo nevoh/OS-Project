@@ -1,0 +1,171 @@
+#include<stdio.h>
+#include<stdlib.h>
+#define LINE_MAX 1024
+
+struct node {
+int process, arrival_time , burst_time, ct , waiting_time , turnaround_time ;
+struct node *next;
+};
+
+struct node *start = NULL;
+
+int main(){
+int i ,j , temp , c;
+float avgw = 0.0;
+struct node *ptr , *newnode , *preptr ;
+int x = 0;
+
+FILE *fp;
+char line[LINE_MAX];
+unsigned int num[3];
+
+if ((fp = fopen("FileInput.txt", "r")) == NULL)
+        return 0;
+
+        
+while (fgets(line, LINE_MAX, fp) != NULL) {
+        sscanf(line,"%d:%d:%d\n",&num[0],&num[1],&num[2]);
+       	newnode = (struct node*) malloc(sizeof(struct node));
+		newnode->arrival_time = num[1];
+		newnode->burst_time = num[0];
+		newnode->next = NULL;
+
+if(start == NULL){
+
+start = newnode;
+
+ptr = start;
+
+}
+
+else {
+
+ptr->next = newnode;
+
+ptr = ptr->next;
+
+}
+x++;
+ 		
+}
+fclose(fp);
+
+
+ptr = start;
+
+i = 1;
+
+while(ptr!=NULL){
+
+ptr->process = i ;
+
+ptr = ptr->next;
+
+i++;
+
+}
+
+ptr = start;
+
+
+while(ptr->next!=NULL){
+
+preptr = ptr->next;
+
+while(preptr!=NULL){
+
+if (ptr->arrival_time > preptr->arrival_time){
+
+temp = ptr->arrival_time;
+
+ptr->arrival_time = preptr->arrival_time;
+
+preptr->arrival_time = temp;
+
+temp = ptr->burst_time;
+
+ptr->burst_time = preptr->burst_time;
+
+preptr->burst_time = temp;
+
+temp = ptr->process;
+
+ptr->process = preptr->process;
+
+preptr->process= temp;
+
+}
+
+preptr = preptr ->next;
+
+}
+
+ptr = ptr->next;
+
+}
+
+ptr = start;
+
+
+
+
+
+ptr = start;
+
+c = ptr->arrival_time ;
+
+while(ptr!=NULL){
+
+ptr->ct = c + ptr->burst_time;
+
+c = ptr->ct;
+
+ptr->turnaround_time = ptr->ct - ptr->arrival_time;
+
+ptr->waiting_time = ptr->turnaround_time - ptr->burst_time;
+
+ptr = ptr->next;
+
+}
+
+
+ptr = start;
+
+while(ptr != NULL){
+
+
+
+avgw = avgw + ptr->waiting_time;
+
+ptr = ptr->next;
+
+}
+
+FILE * fp2;
+   
+  
+   fp2 = fopen ("output1.txt","w");
+ fprintf (fp2, "Process Waiting Times:\n");
+   
+   for(i=1;i<=x;i++){
+
+ptr = start;
+
+while(ptr!=NULL){
+
+if(ptr->process == i)
+ 
+
+fprintf(fp2, "P%d:\t%d ms\n",ptr->process,ptr->waiting_time);
+
+ptr = ptr->next;
+
+}
+
+}
+       fprintf (fp2, "Averge Waiting time %f",avgw/x); 
+   fclose (fp2);
+   printf("Averge Waiting time %f",avgw/x);
+   
+   
+}
